@@ -12,7 +12,7 @@
 #ifdef BIT_OFFSET_IN_BYTE
 #undef BIT_OFFSET_IN_BYTE
 #else
-#define BIT_OFFSET_IN_BYTE(hash_value, bf_byte_size) ((hash_value)%(sizeof(byte)))
+#define BIT_OFFSET_IN_BYTE(hash_value) ((hash_value)%(8))
 #endif
 
 // bloom filter typer
@@ -35,7 +35,7 @@ typedef struct {
 } bloom_filter_t;
 
 // New a bloom filter instance
-int init_bloom_filter(
+int bloom_filter_init (
     bloom_filter_t*          bf,
     const bloom_filter_mode  mode,
     const size_t             bf_bs,

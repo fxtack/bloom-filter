@@ -8,33 +8,18 @@ typedef unsigned char byte;
 
 #define BYTE_MAX UCHAR_MAX
 
-unsigned int RSHash(byte* byte, size_t len);
-unsigned int JSHash(byte* byte, size_t len);
-unsigned int ELFHash(byte* byte, size_t len);
-unsigned int BKDRHash(byte* byte, size_t len);
-unsigned int SDBMHash(byte* byte, size_t len);
-unsigned int DJBHash(byte* byte, size_t len);
-unsigned int DEKHash(byte* byte, size_t len);
-unsigned int BPHash(byte* byte, size_t len);
-unsigned int FNVHash(byte* byte, size_t len);
-unsigned int APHash(byte* byte, size_t len);
-
-typedef enum {
-    hash_rs,
-    hash_js,
-    hash_elf,
-    hash_bkdr,
-    hash_sdbm,
-    hash_djb,
-    hash_dek,
-    hash_bp,
-    hash_fnv,
-    hash_ap
-} hash_class;
+unsigned int RSHash(const byte* buf, size_t buf_bs);
+unsigned int JSHash(const byte* buf, size_t buf_bs);
+unsigned int ELFHash(const byte* buf, size_t buf_bs);
+unsigned int BKDRHash(const byte* buf, size_t buf_bs);
+unsigned int SDBMHash(const byte* buf, size_t buf_bs);
+unsigned int DJBHash(const byte* buf, size_t buf_bs);
+unsigned int DEKHash(const byte* buf, size_t buf_bs);
+unsigned int BPHash(const byte* buf, size_t buf_bs);
+unsigned int FNVHash(const byte* buf, size_t buf_bs);
+unsigned int APHash(const byte* buf, size_t buf_bs);
 
 // Hash function type
-typedef unsigned int (*hash_func_t)(byte* entry, size_t byte_size);
-
-hash_func_t get_func(hash_class hc);
+typedef unsigned int (*hash_func_t)(const byte* buf, size_t buf_bs);
 
 #endif

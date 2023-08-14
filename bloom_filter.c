@@ -1,10 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "bloom_filter.h"
 
 // New a bloom filter instance
-int init_bloom_filter(
+int bloom_filter_init(
     bloom_filter_t*          bf,
     const bloom_filter_mode  mode,
     const size_t             bf_bs,
@@ -73,9 +74,9 @@ int bloom_filter_add(const bloom_filter_t* bf, const byte* buf, size_t buf_bs) {
     switch (bf->mode) {
         case bf_mode_bit_mark:
             for (; i < bf->hash_times; i++) {
-                hash_value  = (hash_func_t)(bf->hash_funcs[i])(buf, buf_bs);
+                hash_value  = ((hash_func_t)(bf->hash_funcs[i]))(buf, buf_bs);
                 byte_offset = BYTE_OFFSET_IN_BF(hash_value, bf->buf_bytes_size);
-                bit_offset  = BIT_OFFSET_IN_BYTE(hash_value, bf->buf_byte_size);
+                bit_offset  = BIT_OFFSET_IN_BYTE(hash_value);
 
                 // Set bit to 1
                 bf->buf[byte_offset] |= ((byte)(1 << bit_offset));
@@ -119,11 +120,11 @@ int bloom_filter_exist(const bloom_filter_t* bf, const byte* buf, size_t buf_bs)
     switch (bf->mode) {
         case bf_mode_bit_mark:
             for (; i < bf->hash_times; i++) {
-                hash_value  = (hash_func_t)(bf->hash_funcs[i])(buf, buf_bs);
+                hash_value  = ((hash_func_t)(bf->hash_funcs[i]))(buf, buf_bs);
                 byte_offset = BYTE_OFFSET_IN_BF(hash_value, bf->buf_bytes_size);
-                bit_offset  = BIT_OFFSET_IN_BYTE(hash_value, bf->buf_bytes_size);
+                bit_offset  = BIT_OFFSET_IN_BYTE(hash_value);
 
-                if (bf->buf[byte_offset] & ((byte)(1 << bit_offset)))
+                if (!(bf->buf[byte_offset] & ((byte)(1 << bit_offset))))
                     return 0;
             }
             break;
