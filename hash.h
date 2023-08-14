@@ -1,5 +1,5 @@
-#ifndef __HASH_FUNCS__
-#define __HASH_FUNCS__
+#ifndef __HASH_H__
+#define __HASH_H__
 
 #include <stddef.h>
 #include <limits.h>
@@ -33,8 +33,8 @@ typedef enum {
 } hash_class;
 
 // Hash function type
-typedef unsigned int (*hash_func)(byte* entry, size_t byte_size);
+typedef unsigned int (*hash_func_t)(byte* entry, size_t byte_size);
 
-hash_func get_func(hash_class hc);
+hash_func_t get_func(hash_class hc);
 
 #endif

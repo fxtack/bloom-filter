@@ -1,4 +1,7 @@
-#include "hash_funcs.h"
+#include "hash.h"
+
+#ifndef __BLOOM_FILTER_H__
+#define __BLOOM_FILTER_H__
 
 #ifdef BYTE_OFFSET_IN_BF
 #undef BYTE_OFFSET_IN_BF
@@ -26,18 +29,18 @@ typedef enum {
 typedef struct {
     bloom_filter_mode mode;
     unsigned int      hash_times;
-    hash_func*        hash_funcs;
+    hash_func_t*      hash_funcs;
     unsigned int      buf_bytes_size;
     byte*             buf;
 } bloom_filter_t;
 
 // New a bloom filter instance
-int new_bloom_filter(
-    const bloom_filter_mode mode,
-    bloom_filter_t*         bf,
-    const size_t            bf_bs,
-    const hash_func* const  hash_funcs,
-    const unsigned int      hash_funcs_amount
+int init_bloom_filter(
+    bloom_filter_t*          bf,
+    const bloom_filter_mode  mode,
+    const size_t             bf_bs,
+    const hash_func_t* const hash_funcs,
+    const unsigned int       hash_funcs_amount
 );
 
 // Delete a bloom filter instance
@@ -51,3 +54,5 @@ int bloom_filter_exist(const bloom_filter_t* bf, const byte* buf, size_t buf_bs)
 
 // Reset bloom filter
 int bloom_filter_reset(bloom_filter_t* bf);
+
+#endif

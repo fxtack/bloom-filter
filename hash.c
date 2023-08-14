@@ -1,14 +1,14 @@
-#include "hash_funcs.h"
+#include "hash.h"
 
 unsigned int RSHash(byte* buf, size_t len) {
-   unsigned int b    = 378551;   
-   unsigned int a    = 63689;   
-   unsigned int hash = 0;   
-   unsigned int i    = 0;   
-   for(i = 0; i < len; buf++, i++) {   
-      hash = hash * a + (*buf);   
+   unsigned int b    = 378551;
+   unsigned int a    = 63689;
+   unsigned int hash = 0;
+   unsigned int i    = 0;
+   for(i = 0; i < len; buf++, i++) {
+      hash = hash * a + (*buf);
       a = a * b;
-   }   
+   }
    return hash;
 }
 
@@ -102,7 +102,7 @@ unsigned int APHash(byte* buf, size_t len) {
    return hash;
 }
 
-hash_func get_func(hash_class hc) {
+hash_func_t get_func(hash_class hc) {
    switch (hc) {
       case hash_rs:
          return RSHash;
