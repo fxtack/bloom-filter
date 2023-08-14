@@ -55,4 +55,15 @@ int bloom_filter_exist(const bloom_filter_t* bf, const byte* buf, size_t buf_bs)
 // Reset bloom filter
 int bloom_filter_reset(bloom_filter_t* bf);
 
+typedef enum {
+    bf_ok = 0,
+    bf_error_invalid_mode = INT_MIN,
+    bf_error_allocate_buf,
+    bf_error_allocate_hash_funcs,
+    bf_error_null_ptr,
+    bf_error_counter_exceeded,
+} bloom_filter_result;
+
+#define BF_ERROR(error) ((error) < 0)
+
 #endif

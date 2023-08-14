@@ -4,52 +4,46 @@
 #include "bloom_filter.h"
 
 int main(int argc, char *argv[]) {
-    int ret = 0;
-    bloom_filter_t bf;
-    hash_func_t hash_funcs[3] = {RSHash, JSHash, ELFHash};
-    char str1[] = "hello world";
-    char str2[] = "hello World";
+    const unsigned int HASH_TIMES = 3;
+    bloom_filter_result ret = 0;
+    bloom_filter_t bf = { 0 };
+    hash_func_t hash_funcs[HASH_TIMES] = {RSHash, JSHash, ELFHash};
 
-    ret = bloom_filter_init(&bf, bf_mode_bit_mark, (1<<10), hash_funcs, 3);
-    if (ret == -1) {
-        fprintf(stderr, "Error: bloom filter initialization failed.\n");
+    // Test bloom filter
+    const unsigned int test_cases = 3;
+    unsigned int i = 0;
+    char str_1[] = "hello star";
+    char str_2[] = "hello moon";
+    char str_3[] = "hello star";
+    char *str = NULL;
+    char *strings[test_cases] = { str_1, str_2, str_3 };
+
+    // Bloom filter initialize
+    ret = bloom_filter_init(&bf, bf_mode_bit_mark, (1<<10), hash_funcs, HASH_TIMES);
+    if (BF_ERROR(ret)) {
+        fprintf(stderr, "Error(%d): call bloom_filter_init failed.\n", ret);
         return ret;
     }
 
-    ret = bloom_filter_add(&bf, (byte*)str1, strlen(str1));
-    if (ret == -1) {
-        fprintf(stderr, "Error: add entry to bloom filter failed\n");
+    // Add string to bloom filter
+    ret = bloom_filter_add(&bf, (byte*)str_1, strlen(str_1));
+    if (BF_ERROR(ret)) {
+        fprintf(stderr, "Error(%d): call bloom_filter_add failed for %s.\n", ret, str_1);
         return ret;
     }
 
-    ret = bloom_filter_exist(&bf, (byte*)str1, strlen(str1));
-    switch (ret) {
-        case -1:
-            fprintf(stderr, "Error: bloom filter exists failed.\n");
-            break;
-        case 0:
-            printf("Not Exist\n");
-            break;
-        case 1:
-            printf("Exist\n");
-            break;
-        default:
-            fprintf(stderr, "Error: unknown bloom filter existence result.\n");
+    // Check if the strings are in the bloom filter
+    for (; i < test_cases; i++) {
+        str = strings[i];
+        ret = bloom_filter_exist(&bf, (byte*)str, strlen(str));
+        if (BF_ERROR(ret)) {
+            fprintf(stderr, "Error(%d): call bloom_filter_exist failed for %s.\n", ret, str);
+        } else if (ret) {
+            printf("String `%s` already exists.\n", str);
+        } else {
+            printf("String `%s` dose not exist.\n", str);
+        }
     }
 
-    ret = bloom_filter_exist(&bf, (byte*)str2, strlen(str2));
-    switch (ret) {
-        case -1:
-            fprintf(stderr, "Error: bloom filter exists failed.\n");
-            break;
-        case 0:
-            printf("Not Exist\n");
-            break;
-        case 1:
-            printf("Exist\n");
-            break;
-        default:
-            fprintf(stderr, "Error: unknown bloom filter existence result.\n");
-    }
-
+    return 0;
 }

@@ -18,7 +18,7 @@ int bloom_filter_init(
     if (IS_VALID_BF_MODE(mode)) {
         bf->mode = mode;
     } else {
-        return -1;
+        return bf_error_invalid_mode;
     }
 
     // Allocate bloom filter buffer memory
@@ -27,7 +27,7 @@ int bloom_filter_init(
         memset(bf->buf, 0, bf_bs);
         bf->buf_bytes_size = bf_bs;
     } else {
-        return -1;
+        return bf_error_allocate_buf;
     }
     
     // Copy hash functions
@@ -37,16 +37,16 @@ int bloom_filter_init(
         memcpy(bf->hash_funcs, hash_funcs, hash_funcs_bytes_size);
         bf->hash_times = hash_times;
     } else {
-        return -1;
+        return bf_error_allocate_hash_funcs;
     }
 
-    return 0;
+    return bf_ok;
 }
 
 // Delete a bloom filter instance
 int delete_bloom_filter(bloom_filter_t *bf) {
     if (bf->buf == NULL) {
-        return -1;
+        return bf_error_null_ptr;
     }
 
     // Free bloom filter buffer memory
@@ -57,7 +57,7 @@ int delete_bloom_filter(bloom_filter_t *bf) {
     free(bf->hash_funcs);
     bf->hash_funcs = NULL;
     
-    return 0;
+    return bf_ok;
 }
 
 // Add a entry to bloom filter
@@ -68,7 +68,7 @@ int bloom_filter_add(const bloom_filter_t* bf, const byte* buf, size_t buf_bs) {
     unsigned int bit_offset  = 0;
 
     if (bf == NULL) {
-        return -1;
+        return bf_error_null_ptr;
     }
 
     switch (bf->mode) {
@@ -89,7 +89,7 @@ int bloom_filter_add(const bloom_filter_t* bf, const byte* buf, size_t buf_bs) {
 
                 if (bf->buf[byte_offset] == BYTE_MAX) {
                     // Exceeded the maximum value of byte
-                    return -1;
+                    return bf_error_counter_exceeded;
                 }
                 
                 // Byte counter increment
@@ -99,10 +99,10 @@ int bloom_filter_add(const bloom_filter_t* bf, const byte* buf, size_t buf_bs) {
 
         default:
             // Unknown bloom filter mode
-            return -1;
+            return bf_error_invalid_mode;
     }
 
-    return 0;
+    return bf_ok;
 }
 
 // Determine whether a value exists in the bloom filter
@@ -114,7 +114,7 @@ int bloom_filter_exist(const bloom_filter_t* bf, const byte* buf, size_t buf_bs)
     int result = 1;
 
     if (bf == NULL) {
-        return -1;
+        return bf_error_null_ptr;
     }
 
     switch (bf->mode) {
@@ -137,7 +137,7 @@ int bloom_filter_exist(const bloom_filter_t* bf, const byte* buf, size_t buf_bs)
 
         default:
             // unknown bloom filter mode
-            return -1;
+            return bf_error_invalid_mode;
     }
 
     return result;
@@ -146,10 +146,10 @@ int bloom_filter_exist(const bloom_filter_t* bf, const byte* buf, size_t buf_bs)
 // Reset bloom filter
 int bloom_filter_reset(bloom_filter_t* bf) {
     if (bf->buf == NULL) {
-        return -1;
+        return bf_error_null_ptr;
     }
 
     memset(bf->buf, 0, bf->buf_bytes_size);
 
-    return 0;
+    return bf_ok;
 }

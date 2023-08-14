@@ -8,6 +8,8 @@ typedef unsigned char byte;
 
 #define BYTE_MAX UCHAR_MAX
 
+#define SUPPORT_HASH_FUNCS_MAX 10
+
 unsigned int RSHash(const byte* buf, size_t buf_bs);
 unsigned int JSHash(const byte* buf, size_t buf_bs);
 unsigned int ELFHash(const byte* buf, size_t buf_bs);
