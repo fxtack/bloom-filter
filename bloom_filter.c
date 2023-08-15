@@ -75,7 +75,7 @@ int bloom_filter_add(const bloom_filter_t* bf, const byte* buf, size_t buf_bs) {
         case bf_mode_bit_mark:
             for (; i < bf->hash_times; i++) {
                 hash_value  = ((hash_func_t)(bf->hash_funcs[i]))(buf, buf_bs);
-                byte_offset = BYTE_OFFSET_IN_BF(hash_value, bf->buf_bytes_size);
+                byte_offset = BYTE_OFFSET_IN_BF(hash_value / 8, bf->buf_bytes_size);
                 bit_offset  = BIT_OFFSET_IN_BYTE(hash_value);
 
                 // Set bit to 1
@@ -121,7 +121,7 @@ int bloom_filter_exist(const bloom_filter_t* bf, const byte* buf, size_t buf_bs)
         case bf_mode_bit_mark:
             for (; i < bf->hash_times; i++) {
                 hash_value  = ((hash_func_t)(bf->hash_funcs[i]))(buf, buf_bs);
-                byte_offset = BYTE_OFFSET_IN_BF(hash_value, bf->buf_bytes_size);
+                byte_offset = BYTE_OFFSET_IN_BF(hash_value / 8, bf->buf_bytes_size);
                 bit_offset  = BIT_OFFSET_IN_BYTE(hash_value);
 
                 if (!(bf->buf[byte_offset] & ((byte)(1 << bit_offset))))
