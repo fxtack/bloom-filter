@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[]) {
     const unsigned int HASH_TIMES = 3;
-    bloom_filter_result ret = 0;
+    bf_result ret = 0;
     bloom_filter_t bf = { 0 };
     hash_func_t hash_funcs[HASH_TIMES] = {RSHash, JSHash, ELFHash};
 
@@ -24,6 +24,13 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Error(%d): call bloom_filter_init failed.\n", ret);
         return ret;
     }
+
+    // printf("Hello world");
+    // ret = bloom_filter_restore(&bf, "my_bloom_filter.bf");
+    // if (BF_ERROR(ret)) {
+    //     fprintf(stderr, "Error(%d): call bloom_filter_restore failed.\n", ret);
+    //     return ret;
+    // }
 
     // Add string to bloom filter
     ret = bloom_filter_add(&bf, (byte*)str_1, strlen(str_1));
@@ -44,6 +51,12 @@ int main(int argc, char *argv[]) {
             printf("String `%s` dose not exist.\n", str);
         }
     }
+
+    // ret = bloom_filter_dump(&bf, "my_bloom_filter.bf");
+    // if (BF_ERROR(ret)) {
+    //     fprintf(stderr, "Error(%d): call bloom_filter_dump failed.\n", ret);
+    //     return ret;
+    // }
 
     return 0;
 }

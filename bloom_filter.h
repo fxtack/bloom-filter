@@ -34,6 +34,8 @@ typedef struct {
     byte*             buf;
 } bloom_filter_t;
 
+#define BF_META_BYTES_SIZE (sizeof(bloom_filter_t) - sizeof(byte*))
+
 // New a bloom filter instance
 int bloom_filter_init (
     bloom_filter_t*          bf,
@@ -43,18 +45,6 @@ int bloom_filter_init (
     const unsigned int       hash_funcs_amount
 );
 
-// Delete a bloom filter instance
-int delete_bloom_filter(bloom_filter_t *bf);
-
-// Add a entry to bloom filter
-int bloom_filter_add(const bloom_filter_t* bf, const byte* buf, size_t buf_bs);
-
-// Determine whether a value exists in the bloom filter
-int bloom_filter_exist(const bloom_filter_t* bf, const byte* buf, size_t buf_bs);
-
-// Reset bloom filter
-int bloom_filter_reset(bloom_filter_t* bf);
-
 typedef enum {
     bf_ok = 0,
     bf_error_invalid_mode = INT_MIN,
@@ -62,8 +52,39 @@ typedef enum {
     bf_error_allocate_hash_funcs,
     bf_error_null_ptr,
     bf_error_counter_exceeded,
-} bloom_filter_result;
+    bf_error_invalid_file_path,
+    bf_error_open_file_failed,
+    bf_error_dump_file_failed,
+} bf_result;
 
 #define BF_ERROR(error) ((error) < 0)
+
+char* bf_result_msg(bf_result code);
+
+// Delete a bloom filter instance
+bf_result delete_bloom_filter(bloom_filter_t *bf);
+
+// Add a entry to bloom filter
+bf_result bloom_filter_add(
+    const bloom_filter_t* bf,
+    const byte*           buf,
+    size_t                buf_bs
+);
+
+// Determine whether a value exists in the bloom filter
+bf_result bloom_filter_exist(
+    const bloom_filter_t* bf,
+    const byte*           buf,
+    size_t                buf_bs
+);
+
+// Reset bloom filter
+bf_result bloom_filter_reset(bloom_filter_t* bf);
+
+// Dump bloom filter to file
+bf_result bloom_filter_dump(
+    const bloom_filter_t* bf,
+    const char* const  file_path
+);
 
 #endif

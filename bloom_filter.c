@@ -4,6 +4,33 @@
 
 #include "bloom_filter.h"
 
+char* bf_result_msg(bf_result code) {
+    switch (code) {
+    case bf_ok:
+        return "ok";
+    case bf_error_invalid_mode:
+        return "invalid bloom filter mode";
+    case bf_error_allocate_buf:
+        return "allocate bloom filter data buffer failed";
+    case bf_error_allocate_hash_funcs:
+        return "allocate bloom filter hash functions failed";
+    case bf_error_null_ptr:
+        return "null pointer bloom filter";
+    case bf_error_counter_exceeded:
+        return "bloom filter counter have exceeded";
+    case bf_error_invalid_file_path:
+        return "invalid file path";
+    case bf_error_open_file_failed:
+        return "open file failed";
+    case bf_error_dump_file_failed:
+        return "dump bloom filter failed";
+    case bf_error_restore_failed:
+        return "restore bloom filter failed";
+    default:
+        return "unknown result";
+    }
+}
+
 // New a bloom filter instance
 int bloom_filter_init(
     bloom_filter_t*          bf,
@@ -61,7 +88,7 @@ int delete_bloom_filter(bloom_filter_t *bf) {
 }
 
 // Add a entry to bloom filter
-int bloom_filter_add(const bloom_filter_t* bf, const byte* buf, size_t buf_bs) {
+bf_result bloom_filter_add(const bloom_filter_t* bf, const byte* buf, size_t buf_bs) {
     unsigned int i = 0;
     unsigned int hash_value  = 0;
     unsigned int byte_offset = 0;
@@ -106,7 +133,7 @@ int bloom_filter_add(const bloom_filter_t* bf, const byte* buf, size_t buf_bs) {
 }
 
 // Determine whether a value exists in the bloom filter
-int bloom_filter_exist(const bloom_filter_t* bf, const byte* buf, size_t buf_bs) {
+bf_result bloom_filter_exist(const bloom_filter_t* bf, const byte* buf, size_t buf_bs) {
     unsigned int i = 0;
     unsigned int hash_value  = 0;
     unsigned int byte_offset = 0;
@@ -144,12 +171,62 @@ int bloom_filter_exist(const bloom_filter_t* bf, const byte* buf, size_t buf_bs)
 }
 
 // Reset bloom filter
-int bloom_filter_reset(bloom_filter_t* bf) {
+bf_result bloom_filter_reset(bloom_filter_t* bf) {
     if (bf->buf == NULL) {
         return bf_error_null_ptr;
     }
 
     memset(bf->buf, 0, bf->buf_bytes_size);
+
+    return bf_ok;
+}
+
+// Dump bloom filter from file
+bf_result bloom_filter_dump(
+    const bloom_filter_t* bf,
+    const char* const     file_path
+) {
+    FILE* file;
+    byte* write_buf;
+    size_t write_buf_bs = 0;
+    size_t bf_meta_bs = BF_META_BYTES_SIZE;
+    size_t written_bs = 0;
+
+    // Invalid input parameter
+    if (bf == NULL) return bf_error_null_ptr;
+    if (file_path == NULL) return bf_error_invalid_file_path;
+
+    // Open file
+    file = fopen(file_path, "wb");
+    if (file == NULL) {
+        return bf_error_open_file_failed;
+    }
+
+    // Allocate write buffer
+    write_buf_bs = bf_meta_bs + bf->buf_bytes_size;
+    write_buf = malloc(write_buf_bs);
+
+    // Copy bloom filter metadata to write buffer
+    memcpy(write_buf, bf, bf_meta_bs);
+
+    // Copy bloom filter data to write buffer
+    write_buf += bf_meta_bs;
+    memcpy(write_buf, bf->buf, bf->buf_bytes_size);
+    write_buf -= bf_meta_bs;
+
+    // Write bloom filter data
+    written_bs = fwrite(write_buf, sizeof(byte), write_buf_bs, file);
+    if (written_bs != write_buf_bs) {
+
+        // Dump bloom filter failed, roll back
+        fclose(file);
+        remove(file_path);
+        return bf_error_dump_file_failed;
+    }
+
+    fflush(file);
+
+    fclose(file);
 
     return bf_ok;
 }
