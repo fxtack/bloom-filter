@@ -20,7 +20,7 @@ typedef enum {
     bf_mode_minimum = 0,
     bf_mode_bit_mark,
     bf_mode_counter,
-    bf_mode_maximum = 2147483647
+    bf_mode_maximum = INT_MAX
 } bloom_filter_mode;
 
 #define IS_VALID_BF_MODE(mode) (((mode) >= bf_mode_minimum) && ((mode) <= bf_mode_maximum)) 

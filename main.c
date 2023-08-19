@@ -21,21 +21,14 @@ int main(int argc, char *argv[]) {
     // Bloom filter initialize
     ret = bloom_filter_init(&bf, bf_mode_bit_mark, (1<<10), hash_funcs, HASH_TIMES);
     if (BF_ERROR(ret)) {
-        fprintf(stderr, "Error(%d): call bloom_filter_init failed.\n", ret);
+        fprintf(stderr, "Error(%d): %s.\n", ret, bf_result_msg(ret));
         return ret;
     }
-
-    // printf("Hello world");
-    // ret = bloom_filter_restore(&bf, "my_bloom_filter.bf");
-    // if (BF_ERROR(ret)) {
-    //     fprintf(stderr, "Error(%d): call bloom_filter_restore failed.\n", ret);
-    //     return ret;
-    // }
 
     // Add string to bloom filter
     ret = bloom_filter_add(&bf, (byte*)str_1, strlen(str_1));
     if (BF_ERROR(ret)) {
-        fprintf(stderr, "Error(%d): call bloom_filter_add failed for %s.\n", ret, str_1);
+        fprintf(stderr, "Error(%d): %s, param: %s.\n", ret, bf_result_msg(ret), str_1);
         return ret;
     }
 
@@ -44,7 +37,7 @@ int main(int argc, char *argv[]) {
         str = strings[i];
         ret = bloom_filter_exist(&bf, (byte*)str, strlen(str));
         if (BF_ERROR(ret)) {
-            fprintf(stderr, "Error(%d): call bloom_filter_exist failed for %s.\n", ret, str);
+            fprintf(stderr, "Error(%d): %s, param: %s.\n", ret, bf_result_msg(ret), str);
         } else if (ret) {
             printf("String `%s` already exists.\n", str);
         } else {
@@ -52,11 +45,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // ret = bloom_filter_dump(&bf, "my_bloom_filter.bf");
-    // if (BF_ERROR(ret)) {
-    //     fprintf(stderr, "Error(%d): call bloom_filter_dump failed.\n", ret);
-    //     return ret;
-    // }
+    ret = bloom_filter_dump(&bf, "my_bloom_filter.bf");
+    if (BF_ERROR(ret)) {
+        fprintf(stderr, "Error(%d): call bloom_filter_dump failed.\n", ret);
+        return ret;
+    }
 
     return 0;
 }

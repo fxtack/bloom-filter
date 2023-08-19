@@ -24,8 +24,6 @@ char* bf_result_msg(bf_result code) {
         return "open file failed";
     case bf_error_dump_file_failed:
         return "dump bloom filter failed";
-    case bf_error_restore_failed:
-        return "restore bloom filter failed";
     default:
         return "unknown result";
     }
@@ -39,7 +37,7 @@ int bloom_filter_init(
     const hash_func_t* const hash_funcs,
     const unsigned int       hash_times
 ) {
-    size_t hash_funcs_bytes_size = 0u;
+    size_t hash_funcs_bs = 0u;
 
     // Invalid bloom filter mode
     if (IS_VALID_BF_MODE(mode)) {
@@ -58,10 +56,10 @@ int bloom_filter_init(
     }
     
     // Copy hash functions
-    hash_funcs_bytes_size = sizeof(hash_func_t) * hash_times;
-    bf->hash_funcs = (hash_func_t*)malloc(hash_funcs_bytes_size);
+    hash_funcs_bs = sizeof(hash_func_t) * hash_times;
+    bf->hash_funcs = (hash_func_t*)malloc(hash_funcs_bs);
     if (bf->hash_funcs != NULL) {
-        memcpy(bf->hash_funcs, hash_funcs, hash_funcs_bytes_size);
+        memcpy(bf->hash_funcs, hash_funcs, hash_funcs_bs);
         bf->hash_times = hash_times;
     } else {
         return bf_error_allocate_hash_funcs;
