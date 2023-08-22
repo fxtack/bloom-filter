@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
         }
     }
     
-    ret = bloom_filter_dump_buf(&bf, "my_bloom_filter_buf.bf");
+    ret = bloom_filter_dump_buf(&bf, "my_bloom_filter_buf.bin");
     if (BF_ERROR(ret)) {
         fprintf(stderr, "Error(%d): call bloom_filter_dump_buf: %s.\n", ret, bf_result_msg(ret));
         return ret;
