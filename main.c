@@ -8,24 +8,25 @@ int main(int argc, char *argv[]) {
     const unsigned int HASH_TIMES = 3;
     bf_result ret = 0;
     bloom_filter_t bf = { 0 };
-    hash_func_t hash_funcs[HASH_TIMES] = {RSHash, JSHash, ELFHash};
+    hash_func_t hash_funcs[HASH_TIMES] = {RSHash, JSHash, DEKHash};
 
     // Test bloom filter
     unsigned int i;
     char *str = NULL;
     char *add_strings[]  = { 
-        "Hello", 
-        "world", 
-        "Hello world" 
+        "hello",
+        "world",
+        "earth",
+        "moon"
     };
     char *test_strings[] = { 
-        "Hello", 
-        "hello",
-        "world"
+        "hello", 
+        "HELLO",
+        "moon"
     };
 
     // Bloom filter initialize
-    ret = bloom_filter_init(&bf, bf_mode_bit_mark, 64, hash_funcs, HASH_TIMES);
+    ret = bloom_filter_init(&bf, bf_mode_bit_mark, 128, hash_funcs, HASH_TIMES);
     if (BF_ERROR(ret)) {
         fprintf(stderr, "Error(%d): %s.\n", ret, bf_result_msg(ret));
         return ret;
@@ -55,13 +56,12 @@ int main(int argc, char *argv[]) {
             printf("String `%s` dose not exist.\n", str);
         }
     }
-
-    // Test bloom filter dump.
-    ret = bloom_filter_dump(&bf, "my_bloom_filter.bf");
+    
+    ret = bloom_filter_dump_buf(&bf, "my_bloom_filter_buf.bf");
     if (BF_ERROR(ret)) {
-        fprintf(stderr, "Error(%d): call bloom_filter_dump failed.\n", ret);
+        fprintf(stderr, "Error(%d): call bloom_filter_dump_buf: %s.\n", ret, bf_result_msg(ret));
         return ret;
     }
-    
+
     return 0;
 }

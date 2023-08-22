@@ -223,7 +223,34 @@ bf_result bloom_filter_dump(
     }
 
     fflush(file);
+    fclose(file);
 
+    return bf_ok;
+}
+
+bf_result bloom_filter_dump_buf(
+    const bloom_filter_t* bf,
+    const char* const file_path
+) {
+    FILE* file;
+    size_t written_bs = 0;
+
+    if (bf == NULL) return bf_error_null_ptr;
+    if (file_path == NULL) return bf_error_invalid_file_path;
+
+    file = fopen(file_path, "wb");
+    if (file == NULL) {
+        return bf_error_open_file_failed;
+    }
+
+    written_bs = fwrite(bf->buf, sizeof(byte), bf->buf_bytes_size, file);
+    if (written_bs != bf->buf_bytes_size) {
+        fclose(file);
+        remove(file_path);
+        return bf_error_dump_file_failed;
+    }
+
+    fflush(file);
     fclose(file);
 
     return bf_ok;

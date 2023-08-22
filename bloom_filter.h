@@ -87,4 +87,11 @@ bf_result bloom_filter_dump(
     const char* const  file_path
 );
 
+// Only dump bloom filter buffer to file
+// This is typically used to observe changes in bloom filter data
+bf_result bloom_filter_dump_buf(
+    const bloom_filter_t* bf,
+    const char* const file_path
+);
+
 #endif
