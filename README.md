@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     };
 
     // Bloom filter initialize
-    ret = bloom_filter_init(&bf, bf_mode_bit_mark, BUF_BS, hash_funcs, HASH_TIMES);
+    ret = bloom_filter_init(&bf, BF_MODE_BIT_MARK, BUF_BS, hash_funcs, HASH_TIMES);
     if (BF_ERROR(ret)) {
         fprintf(stderr, "Error(%d): %s.\n", ret, bf_result_msg(ret));
         return ret;

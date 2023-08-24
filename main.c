@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     };
 
     // Bloom filter initialize
-    ret = bloom_filter_init(&bf, bf_mode_bit_mark, 128, hash_funcs, HASH_TIMES);
+    ret = bloom_filter_init(&bf, BF_MODE_BIT_MARK, 128, hash_funcs, HASH_TIMES);
     if (BF_ERROR(ret)) {
         fprintf(stderr, "Error(%d): %s.\n", ret, bf_result_msg(ret));
         return ret;
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
         ret = bloom_filter_exist(&bf, (byte*)str, strlen(str));
         if (BF_ERROR(ret)) {
             fprintf(stderr, "Error(%d): %s, param: %s.\n", ret, bf_result_msg(ret), str);
-        } else if (ret) {
+        } else if (ret == BF_ENTRY_EXISTS) {
             printf("String `%s` already exists.\n", str);
         } else {
             printf("String `%s` dose not exist.\n", str);

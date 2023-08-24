@@ -6,7 +6,7 @@
 #ifdef BYTE_OFFSET_IN_BF
 #undef BYTE_OFFSET_IN_BF
 #else
-#define BYTE_OFFSET_IN_BF(hash_value, bf_byte_size) ((hash_value)%(bf_byte_size))
+#define BYTE_OFFSET_IN_BF(hash_value, bf_bs) ((hash_value)%(bf_bs))
 #endif
 
 #ifdef BIT_OFFSET_IN_BYTE
@@ -17,20 +17,20 @@
 
 // bloom filter typer
 typedef enum {
-    bf_mode_minimum = 0,
-    bf_mode_bit_mark,
-    bf_mode_counter,
-    bf_mode_maximum = INT_MAX
+    BF_MODE_UNKNOWN = 0,
+    BF_MODE_BIT_MARK,
+    BF_MODE_COUNTER,
+    BF_MODE_MAXIMUM = INT_MAX
 } bloom_filter_mode;
 
-#define IS_VALID_BF_MODE(mode) (((mode) >= bf_mode_minimum) && ((mode) <= bf_mode_maximum)) 
+#define IS_VALID_BF_MODE(mode) (((mode) >= BF_MODE_UNKNOWN) && ((mode) <= BF_MODE_MAXIMUM)) 
 
 // bloom filter
 typedef struct {
     bloom_filter_mode mode;
     unsigned int      hash_times;
     hash_func_t*      hash_funcs;
-    unsigned int      buf_bytes_size;
+    unsigned int      buf_bs;
     byte*             buf;
 } bloom_filter_t;
 
@@ -46,18 +46,24 @@ int bloom_filter_init (
 );
 
 typedef enum {
-    bf_ok = 0,
-    bf_error_invalid_mode = INT_MIN,
-    bf_error_allocate_buf,
-    bf_error_allocate_hash_funcs,
-    bf_error_null_ptr,
-    bf_error_counter_exceeded,
-    bf_error_invalid_file_path,
-    bf_error_open_file_failed,
-    bf_error_dump_file_failed,
+    BF_RESULT_OK = 0,
+    BF_ENTRY_EXISTS,
+    BF_ENTRY_NOT_EXISTS,
+    BF_ERROR_INVALID_MODE = INT_MIN,
+    BF_ERROR_ALLOCATE_BUF,
+    BF_ERROR_ALLOCATE_HASH_FUNCS,
+    BF_ERROR_INVALID_BUF_BS,
+    BF_ERROR_NULL_PTR,
+    BF_ERROR_NULL_BUF,
+    BF_ERROR_COUNTER_EXCEEDED,
+    BF_ERROR_INVALID_FILE_PATH,
+    BF_ERROR_OPEN_FILE_FAILED,
+    BF_ERROR_DUMP_BUF_FILE,
+    BF_ERROR_RESTORE_BUF_FILE
 } bf_result;
 
-#define BF_ERROR(error) ((error) < 0)
+#define BF_ERROR(result) ((result) < 0)
+#define BF_SUCCESS(result) ((result) == BF_RESULT_OK)
 
 char* bf_result_msg(bf_result code);
 
@@ -67,31 +73,31 @@ bf_result delete_bloom_filter(bloom_filter_t *bf);
 // Add a entry to bloom filter
 bf_result bloom_filter_add(
     const bloom_filter_t* bf,
-    const byte*           buf,
-    size_t                buf_bs
+    const byte*           entry,
+    size_t                entry_bs
 );
 
 // Determine whether a value exists in the bloom filter
 bf_result bloom_filter_exist(
     const bloom_filter_t* bf,
-    const byte*           buf,
-    size_t                buf_bs
+    const byte*           entry,
+    size_t                entry_bs
 );
 
 // Reset bloom filter
 bf_result bloom_filter_reset(bloom_filter_t* bf);
 
-// Dump bloom filter to file
-bf_result bloom_filter_dump(
-    const bloom_filter_t* bf,
-    const char* const  file_path
-);
-
 // Only dump bloom filter buffer to file
 // This is typically used to observe changes in bloom filter data
 bf_result bloom_filter_dump_buf(
     const bloom_filter_t* bf,
-    const char* const file_path
+    const char* const     file_path
+);
+
+// Restore bloom filter buffer from file
+bf_result bloom_filter_restore_buf(
+    const bloom_filter_t* bf,
+    const char* const     file_path
 );
 
 #endif
