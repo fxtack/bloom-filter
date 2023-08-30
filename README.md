@@ -69,9 +69,3 @@ $ xxd -bits my_bloom_filter_buf.bin
 0000005a: 00000000 00000000 00000000 00000001 00000000 00000000  ......
 00000078: 00000000 00001000 00000000 00000000 00000000 00000000  ......
 ```
-
-## TODO
-
-- Bloom filter dump/restore.
-- More unit tests.
-- Benchmark test.
